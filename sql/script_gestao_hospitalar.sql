@@ -152,3 +152,26 @@ select
 from empresa_destino e
 join descarte_final d on e.id_empresa = d.id_empresa
 group by e.id_empresa, e.razao_social, e.tipo_tratamento;
+
+-- Criação de View Relatorio final: 
+
+create view vw_rastreabilidade_residuos as
+select 
+    r.id_coleta,
+    s.nome_setor,
+    c.grupo_anvisa,
+    f.nome as funcionario_responsavel,
+    r.peso_kg,
+    r.data_hora_registro,
+    r.status_armazenamento,
+    d.numero_certificado_mtr,
+    e.razao_social as empresa_destino,
+    d.custo_tratamento
+from coleta_residuo r
+join setor_hospital s on r.id_setor = s.id_setor
+join classe_residuo c on r.id_classe = c.id_classe
+join funcionario f on r.id_funcionario = f.id_funcionario
+left join descarte_final d on r.id_coleta = d.id_coleta
+left join empresa_destino e on d.id_empresa = e.id_empresa;
+
+select * from vw_rastreabilidade_residuos;
