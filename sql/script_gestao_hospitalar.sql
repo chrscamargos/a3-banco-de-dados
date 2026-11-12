@@ -175,3 +175,25 @@ left join descarte_final d on r.id_coleta = d.id_coleta
 left join empresa_destino e on d.id_empresa = e.id_empresa;
 
 select * from vw_rastreabilidade_residuos;
+
+-- controle de acesso e segurança
+
+-- 1. Perfil Enfermagem (Operacional): Registra e consulta apenas coletas
+CREATE USER IF NOT EXISTS 'usr_enfermagem'@'%' IDENTIFIED BY 'SenhaEnfermagem2026!';
+GRANT INSERT, SELECT ON gestao_hospitalar.coleta_residuo TO 'usr_enfermagem'@'%';
+
+-- 2. Perfil Gestão Hospitalar: Acesso a relatórios analíticos e visões
+CREATE USER IF NOT EXISTS 'usr_gestao'@'%' IDENTIFIED BY 'SenhaGestao2026!';
+GRANT SELECT ON gestao_hospitalar.vw_rastreabilidade_residuos TO 'usr_gestao'@'%';
+
+-- 3. Perfil Fiscalização / Auditores: Leitura de certificados MTR e descartes
+CREATE USER IF NOT EXISTS 'usr_fiscalizacao'@'%' IDENTIFIED BY 'SenhaFiscal2026!';
+GRANT SELECT ON gestao_hospitalar.descarte_final TO 'usr_fiscalizacao'@'%';
+GRANT SELECT ON gestao_hospitalar.empresa_destino TO 'usr_fiscalizacao'@'%';
+
+-- 4. Perfil Administrador de Banco de Dados (DBA): Gestão total e privilégios
+CREATE USER IF NOT EXISTS 'usr_dba'@'localhost' IDENTIFIED BY 'SenhaDba2026!';
+GRANT ALL PRIVILEGES ON gestao_hospitalar.* TO 'usr_dba'@'localhost' WITH GRANT OPTION;
+
+-- Aplica as permissões no servidor MySQL
+FLUSH PRIVILEGES;
